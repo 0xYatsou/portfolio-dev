@@ -63,6 +63,8 @@ export default function CVSection() {
                     <motion.a
                         href="/cv.pdf"
                         download
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-violet-500 to-blue-500 rounded-xl font-semibold hover:shadow-2xl hover:shadow-violet-500/50 transition-all group"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
