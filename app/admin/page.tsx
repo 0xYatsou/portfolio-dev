@@ -77,6 +77,7 @@ export default function AdminPage() {
     // Modal states
     const [modalMode, setModalMode] = useState<ModalMode>(null);
     const [editingItem, setEditingItem] = useState<any>(null);
+    const [deleteConfirmation, setDeleteConfirmation] = useState<{ table: string; id: string } | null>(null);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -140,16 +141,25 @@ export default function AdminPage() {
         setLoading(false);
     }
 
-    async function handleDelete(table: string, id: string) {
-        if (!confirm("Êtes-vous sûr de vouloir supprimer cet élément ?")) return;
+    function handleDelete(table: string, id: string) {
+        setDeleteConfirmation({ table, id });
+    }
+
+    async function confirmDelete() {
+        if (!deleteConfirmation) return;
 
         try {
-            const { error } = await supabase.from(table).delete().eq("id", id);
+            const { error } = await supabase
+                .from(deleteConfirmation.table)
+                .delete()
+                .eq("id", deleteConfirmation.id);
             if (error) throw error;
+            setDeleteConfirmation(null);
             loadData();
         } catch (error) {
             console.error("Error deleting:", error);
             alert("Erreur lors de la suppression");
+            setDeleteConfirmation(null);
         }
     }
 
@@ -843,6 +853,56 @@ export default function AdminPage() {
                                     className="px-4 py-3 glass rounded-lg hover:bg-slate-800 transition-colors"
                                 >
                                     Annuler
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Delete Confirmation Modal */}
+            <AnimatePresence>
+                {deleteConfirmation && (
+                    <motion.div
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setDeleteConfirmation(null)}
+                    >
+                        <motion.div
+                            className="glass rounded-2xl p-6 w-full max-w-md"
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="p-3 bg-red-500/20 rounded-full">
+                                    <Trash2 className="w-6 h-6 text-red-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold">Confirmer la suppression</h3>
+                                    <p className="text-slate-400 text-sm">
+                                        Cette action est irréversible
+                                    </p>
+                                </div>
+                            </div>
+                            <p className="text-slate-300 mb-6">
+                                Êtes-vous sûr de vouloir supprimer cet élément ?
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setDeleteConfirmation(null)}
+                                    className="flex-1 px-4 py-3 glass rounded-lg hover:bg-slate-800 transition-colors"
+                                >
+                                    Annuler
+                                </button>
+                                <button
+                                    onClick={confirmDelete}
+                                    className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 rounded-lg font-semibold transition-colors"
+                                >
+                                    Supprimer
                                 </button>
                             </div>
                         </motion.div>
