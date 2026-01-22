@@ -25,7 +25,7 @@ const socialLinks = [
     {
         name: "Email",
         icon: Mail,
-        href: "mailto:contact@example.com",
+        href: "mailto:geoffrey.vivien@gmail.com",
         color: "hover:text-purple-400",
     },
 ];
@@ -54,7 +54,7 @@ export default function Footer() {
                     </p>
 
                     <motion.a
-                        href="mailto:contact@example.com"
+                        href="mailto:geoffrey.vivien@gmail.com"
                         className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-violet-500 to-blue-500 rounded-xl font-semibold text-lg hover:shadow-2xl hover:shadow-violet-500/50 transition-all"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
