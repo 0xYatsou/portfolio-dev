@@ -82,7 +82,7 @@ export default function Hero() {
                             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </motion.a>
                         <motion.a
-                            href="https://github.com"
+                            href="https://github.com/0xYatsou"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-8 py-4 glass rounded-xl font-semibold flex items-center gap-2 glow-hover"

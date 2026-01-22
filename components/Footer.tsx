@@ -7,19 +7,19 @@ const socialLinks = [
     {
         name: "GitHub",
         icon: Github,
-        href: "https://github.com",
+        href: "https://github.com/0xYatsou",
         color: "hover:text-violet-400",
     },
     {
         name: "LinkedIn",
         icon: Linkedin,
-        href: "https://linkedin.com",
+        href: "https://linkedin.com/in/geoffrey-vivien",
         color: "hover:text-blue-400",
     },
     {
         name: "Twitter",
         icon: Twitter,
-        href: "https://twitter.com",
+        href: "https://twitter.com/0xYatsou",
         color: "hover:text-sky-400",
     },
     {
