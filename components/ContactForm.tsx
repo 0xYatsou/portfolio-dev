@@ -26,19 +26,36 @@ export default function ContactForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        e.stopPropagation();
+
+        // Prevent multiple submissions
+        if (status === "loading") return;
+
         setStatus("loading");
 
         try {
-            const { error } = await supabase.from("messages").insert([formData]);
-            if (error) throw error;
+            console.log("Submitting form data:", formData);
+            const { data, error } = await supabase.from("messages").insert([formData]);
+
+            console.log("Supabase response:", { data, error });
+
+            if (error) {
+                console.error("Supabase error:", error);
+                throw error;
+            }
+
+            console.log("Message sent successfully!");
             setStatus("success");
             setFormData({ name: "", email: "", subject: "", message: "" });
-            setTimeout(() => setStatus("idle"), 5000);
-        } catch (error) {
+            setTimeout(() => setStatus("idle"), 8000);
+        } catch (error: any) {
             console.error("Error sending message:", error);
+            console.error("Error details:", error.message, error.code);
             setStatus("error");
             setTimeout(() => setStatus("idle"), 5000);
         }
+
+        return false; // Extra safety to prevent form submission
     };
 
     if (isMobile) {
@@ -146,13 +163,16 @@ export default function ContactForm() {
                     )}
                 </button>
 
-                <AnimatePresence>
+                {/* Success Modal */}
+                <AnimatePresence mode="wait">
                     {status === "success" && (
                         <motion.div
-                            className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center text-center p-6"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            key="success-modal"
+                            className="absolute inset-0 bg-slate-950/95 backdrop-blur-sm flex items-center justify-center text-center p-6 z-50 rounded-3xl"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ duration: 0.3 }}
                         >
                             <div className="space-y-4">
                                 <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
