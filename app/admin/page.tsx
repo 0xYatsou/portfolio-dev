@@ -11,6 +11,7 @@ import {
     Code2,
     Eye,
     LogOut,
+    Mail,
     Pencil,
     Plus,
     Save,
@@ -61,10 +62,11 @@ type ModalMode = "add" | "edit" | null;
 export default function AdminPage() {
     const { user, loading: authLoading, signOut } = useAuth();
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<"projects" | "tech" | "cv" | "analytics">("analytics");
+    const [activeTab, setActiveTab] = useState<"projects" | "tech" | "cv" | "analytics" | "messages">("analytics");
     const [projects, setProjects] = useState<Project[]>([]);
     const [technologies, setTechnologies] = useState<Technology[]>([]);
     const [experiences, setExperiences] = useState<Experience[]>([]);
+    const [messages, setMessages] = useState<any[]>([]);
     const [analytics, setAnalytics] = useState<Analytics>({
         total_views: 0,
         unique_visitors: 0,
@@ -109,6 +111,12 @@ export default function AdminPage() {
                     .select("*")
                     .order("order_index");
                 setExperiences(data || []);
+            } else if (activeTab === "messages") {
+                const { data } = await supabase
+                    .from("messages")
+                    .select("*")
+                    .order("created_at", { ascending: false });
+                setMessages(data || []);
             } else if (activeTab === "analytics") {
                 const { count: totalViews } = await supabase
                     .from("page_views")
@@ -214,6 +222,7 @@ export default function AdminPage() {
         { id: "projects", label: "Projets", icon: Code2 },
         { id: "tech", label: "Technologies", icon: Briefcase },
         { id: "cv", label: "Expériences", icon: Users },
+        { id: "messages", label: "Messages", icon: Mail },
     ];
 
     return (
@@ -249,8 +258,8 @@ export default function AdminPage() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all whitespace-nowrap ${activeTab === tab.id
-                                    ? "bg-gradient-to-r from-violet-500 to-blue-500 text-white"
-                                    : "glass text-slate-300 hover:text-white"
+                                ? "bg-gradient-to-r from-violet-500 to-blue-500 text-white"
+                                : "glass text-slate-300 hover:text-white"
                                 }`}
                         >
                             <tab.icon className="w-5 h-5" />
@@ -504,6 +513,60 @@ export default function AdminPage() {
                                                 </div>
                                             </div>
                                         ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Messages Tab */}
+                            {activeTab === "messages" && (
+                                <div className="space-y-6">
+                                    <h2 className="text-2xl font-bold mb-6">Messages reçus</h2>
+                                    <div className="space-y-4">
+                                        {messages.map((msg) => (
+                                            <motion.div
+                                                key={msg.id}
+                                                className="glass p-6 rounded-2xl border border-slate-700/50"
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                            >
+                                                <div className="flex items-start justify-between mb-4">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 bg-violet-500/20 rounded-full flex items-center justify-center text-violet-400 font-bold text-xl">
+                                                            {msg.name.charAt(0).toUpperCase()}
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="font-bold text-lg">{msg.name}</h3>
+                                                            <p className="text-blue-400 text-sm">{msg.email}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-slate-500 text-xs">
+                                                            {new Date(msg.created_at).toLocaleString("fr-FR")}
+                                                        </p>
+                                                        <button
+                                                            onClick={() => handleDelete("messages", msg.id)}
+                                                            className="mt-2 p-2 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                                                    <p className="text-violet-300 text-sm font-semibold mb-2 uppercase tracking-wider">
+                                                        Sujet: {msg.subject}
+                                                    </p>
+                                                    <p className="text-slate-300 whitespace-pre-wrap">
+                                                        {msg.message}
+                                                    </p>
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                        {messages.length === 0 && (
+                                            <div className="text-center py-20 glass rounded-2xl border border-dashed border-slate-700">
+                                                <Mail className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+                                                <p className="text-slate-500">Aucun message reçu pour le moment.</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )}

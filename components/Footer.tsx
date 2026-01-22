@@ -30,6 +30,8 @@ const socialLinks = [
     },
 ];
 
+import ContactForm from "./ContactForm";
+
 export default function Footer() {
     return (
         <footer id="contact" className="relative py-20 px-6 overflow-hidden">
@@ -48,24 +50,11 @@ export default function Footer() {
                     <h2 className="text-4xl md:text-6xl font-bold mb-6">
                         Travaillons <span className="gradient-text">Ensemble</span>
                     </h2>
-                    <p className="text-slate-400 text-lg max-w-2xl mx-auto mb-8">
-                        Un projet en tête ? Discutons de la façon dont je peux vous aider à
-                        le concrétiser.
+                    <p className="text-slate-400 text-lg max-w-2xl mx-auto mb-12">
+                        Un projet en tête ? Contactez-moi directement via le formulaire ou par email sur mobile.
                     </p>
 
-                    <motion.button
-                        onClick={() => {
-                            navigator.clipboard.writeText("geoffrey.vivien@gmail.com");
-                            alert("Email copié dans le presse-papier !");
-                            window.location.href = "mailto:geoffrey.vivien@gmail.com";
-                        }}
-                        className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-violet-500 to-blue-500 rounded-xl font-semibold text-lg hover:shadow-2xl hover:shadow-violet-500/50 transition-all"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        <Mail className="w-6 h-6" />
-                        Me contacter
-                    </motion.button>
+                    <ContactForm />
                 </motion.div>
 
                 {/* Social Links */}
