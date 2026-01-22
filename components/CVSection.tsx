@@ -61,7 +61,7 @@ export default function CVSection() {
 
                     {/* Download CV Button */}
                     <motion.a
-                        href="/cv.pdf"
+                        href={process.env.NODE_ENV === "production" ? "/portfolio-dev/cv.pdf" : "/cv.pdf"}
                         download
                         className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-violet-500 to-blue-500 rounded-xl font-semibold hover:shadow-2xl hover:shadow-violet-500/50 transition-all group"
                         whileHover={{ scale: 1.05 }}
@@ -83,8 +83,8 @@ export default function CVSection() {
                             <motion.div
                                 key={index}
                                 className={`relative flex items-center ${index % 2 === 0
-                                        ? "md:flex-row"
-                                        : "md:flex-row-reverse"
+                                    ? "md:flex-row"
+                                    : "md:flex-row-reverse"
                                     }`}
                                 initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                                 whileInView={{ opacity: 1, x: 0 }}
