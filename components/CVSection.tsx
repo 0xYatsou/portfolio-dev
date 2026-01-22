@@ -61,7 +61,7 @@ export default function CVSection() {
 
                     {/* Download CV Button */}
                     <motion.a
-                        href={process.env.NODE_ENV === "production" ? "/portfolio-dev/cv.pdf" : "/cv.pdf"}
+                        href="/cv.pdf"
                         download
                         className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-violet-500 to-blue-500 rounded-xl font-semibold hover:shadow-2xl hover:shadow-violet-500/50 transition-all group"
                         whileHover={{ scale: 1.05 }}
