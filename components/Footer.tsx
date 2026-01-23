@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Github, Linkedin, Twitter, Mail, Heart } from "lucide-react";
+import { Github, Mail, Heart } from "lucide-react";
 
 const socialLinks = [
     {
@@ -9,24 +9,14 @@ const socialLinks = [
         icon: Github,
         href: "https://github.com/0xYatsou",
         color: "hover:text-violet-400",
-    },
-    {
-        name: "LinkedIn",
-        icon: Linkedin,
-        href: "https://linkedin.com/in/geoffrey-vivien",
-        color: "hover:text-blue-400",
-    },
-    {
-        name: "Twitter",
-        icon: Twitter,
-        href: "https://twitter.com/0xYatsou",
-        color: "hover:text-sky-400",
+        external: true,
     },
     {
         name: "Email",
         icon: Mail,
-        href: "mailto:geoffrey.vivien@gmail.com",
+        href: "#contact",
         color: "hover:text-purple-400",
+        external: false,
     },
 ];
 
@@ -69,8 +59,21 @@ export default function Footer() {
                         <motion.a
                             key={social.name}
                             href={social.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            {...(social.external && {
+                                target: "_blank",
+                                rel: "noopener noreferrer",
+                            })}
+                            onClick={(e) => {
+                                if (!social.external) {
+                                    e.preventDefault();
+                                    const contactSection = document.querySelector('#contact');
+                                    if (contactSection) {
+                                        const yOffset = -80; // Offset pour la navbar
+                                        const y = contactSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                                        window.scrollTo({ top: y, behavior: 'smooth' });
+                                    }
+                                }
+                            }}
                             className={`p-4 glass rounded-xl glow-hover transition-colors ${social.color}`}
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
