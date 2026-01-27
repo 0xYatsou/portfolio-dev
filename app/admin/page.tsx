@@ -18,6 +18,8 @@ import {
     Trash2,
     Users,
     X,
+    Upload,
+    Loader2
 } from "lucide-react";
 
 interface Project {
@@ -27,6 +29,7 @@ interface Project {
     tags: string[];
     github_url: string;
     live_url: string;
+    image_url: string;
     span: string;
     order_index: number;
 }
@@ -73,6 +76,7 @@ export default function AdminPage() {
         recent_views: [],
     });
     const [loading, setLoading] = useState(true);
+    const [isUploading, setIsUploading] = useState(false);
 
     // Modal states
     const [modalMode, setModalMode] = useState<ModalMode>(null);
@@ -163,6 +167,35 @@ export default function AdminPage() {
         }
     }
 
+    async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `project-previews/${fileName}`;
+
+            const { error: uploadError, data } = await supabase.storage
+                .from('portfolio')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('portfolio')
+                .getPublicUrl(filePath);
+
+            setEditingItem({ ...editingItem, image_url: publicUrl });
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            alert('Erreur lors de l\'upload de l\'image. Assurez-vous que le bucket "portfolio" existe et est public.');
+        } finally {
+            setIsUploading(false);
+        }
+    }
+
     async function handleSave(table: string, data: any) {
         try {
             if (modalMode === "add") {
@@ -193,6 +226,7 @@ export default function AdminPage() {
                 tags: [],
                 github_url: "",
                 live_url: "",
+                image_url: "",
                 span: "md:col-span-1",
                 order_index: projects.length + 1,
             });
@@ -395,8 +429,13 @@ export default function AdminPage() {
                                         {projects.map((project) => (
                                             <div
                                                 key={project.id}
-                                                className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg hover:bg-slate-900/70 transition-colors"
+                                                className="flex items-center gap-4 p-4 bg-slate-900/50 rounded-lg hover:bg-slate-900/70 transition-colors"
                                             >
+                                                {project.image_url && (
+                                                    <div className="w-16 h-10 rounded overflow-hidden border border-slate-700 flex-shrink-0">
+                                                        <img src={project.image_url} alt="" className="w-full h-full object-cover" />
+                                                    </div>
+                                                )}
                                                 <div className="flex-1">
                                                     <h3 className="font-bold text-lg">{project.title}</h3>
                                                     <p className="text-slate-400 text-sm">
@@ -696,6 +735,90 @@ export default function AdminPage() {
                                                     })
                                                 }
                                                 className="w-full px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg focus:outline-none focus:border-violet-500"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">
+                                            URL Image (Aperçu)
+                                        </label>
+                                        <input
+                                            type="url"
+                                            value={editingItem.image_url}
+                                            onChange={(e) =>
+                                                setEditingItem({
+                                                    ...editingItem,
+                                                    image_url: e.target.value,
+                                                })
+                                            }
+                                            placeholder="https://images.unsplash.com/..."
+                                            className="w-full px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg focus:outline-none focus:border-violet-500"
+                                        />
+                                    </div>
+                                    <div className="space-y-4">
+                                        <label className="block text-sm font-medium">Image de couverture</label>
+
+                                        <div className="flex items-center gap-6">
+                                            {editingItem.image_url ? (
+                                                <div className="relative w-32 h-20 rounded-lg overflow-hidden border border-slate-700">
+                                                    <img
+                                                        src={editingItem.image_url}
+                                                        alt="Preview"
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setEditingItem({ ...editingItem, image_url: "" })}
+                                                        className="absolute top-1 right-1 p-1 bg-red-500 rounded-full hover:bg-red-600 transition-colors"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="w-32 h-20 rounded-lg border-2 border-dashed border-slate-700 flex items-center justify-center text-slate-500 text-xs">
+                                                    Pas d'image
+                                                </div>
+                                            )}
+
+                                            <div className="flex-1">
+                                                <input
+                                                    type="file"
+                                                    id="project-image"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={handleImageUpload}
+                                                    disabled={isUploading}
+                                                />
+                                                <label
+                                                    htmlFor="project-image"
+                                                    className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-slate-700 cursor-pointer hover:bg-slate-800 transition-colors ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                >
+                                                    {isUploading ? (
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                    ) : (
+                                                        <Upload className="w-4 h-4" />
+                                                    )}
+                                                    {isUploading ? "Upload en cours..." : "Choisir un fichier"}
+                                                </label>
+                                                <p className="text-[10px] text-slate-500 mt-2">
+                                                    PNG, JPG ou WEBP. Max 2Mo.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs text-slate-400 mb-1">Ou coller une URL directe</label>
+                                            <input
+                                                type="url"
+                                                value={editingItem.image_url}
+                                                onChange={(e) =>
+                                                    setEditingItem({
+                                                        ...editingItem,
+                                                        image_url: e.target.value,
+                                                    })
+                                                }
+                                                placeholder="https://..."
+                                                className="w-full px-3 py-1.5 text-sm bg-slate-900/50 border border-slate-700 rounded-lg focus:outline-none focus:border-violet-500"
                                             />
                                         </div>
                                     </div>

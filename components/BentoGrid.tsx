@@ -48,5 +48,5 @@ export default async function BentoGrid() {
     return <BentoGridClient projects={projectsWithSpan} />;
 }
 
-// Revalidation automatique toutes les 60 secondes
-export const revalidate = 60;
+// Forcer le rendu dynamique pour voir les changements immédiatement
+export const dynamic = 'force-dynamic';
